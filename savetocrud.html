@@ -1,0 +1,112 @@
+<html>
+<head>
+	<title>login</title>
+	<style>
+		form {
+			text-align: center;
+			color: black;
+			font-size: 20px; 
+			font-family:verdana; 
+			background-color:pink; 
+		}
+		input {
+		color:tomato;
+		font-size: 30px;
+		
+	}
+	button {
+		color: red;
+	}
+	</style>
+</head>
+    <body>
+        <form onsubmit="savetoLocalStorage(event)">
+        	<label>Name:</label>
+        	<br>
+            <input type="text" name="username" required/>
+            <br>
+            <label>Email:</label>
+            <br>
+            <input type="email" name="emailId" required/>
+            <br>
+            <label>phone Number:</label>
+            <br>
+            <input type="phno" name="phonenumber" />
+            <br>
+            <label>Password:</label>
+            <br>
+            <input type="password" name="password" required/>
+            <br>
+            <br>
+            <button>SignUp</button>
+        </form>
+        <ul id='listOfUsers'></ul>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+        <script >
+        	function savetoLocalStorage(event){
+        		event.preventDefault();
+        		const name=event.target.username.value;
+        		const email=event.target.emailId.value;
+        		const phonenumber=event.target.phonenumber.value;
+        		const password=event.target.password.value;
+        		// localStorage.setItem('name',name);
+        		// localStorage.setItem('email',email);
+        		// localStorage.setItem('phonenumber',phonenumber);
+        		// localStorage.setItem('password',password);
+                const obj={
+                    name:name,
+                    email:email,
+                    phonenumber:phonenumber,
+                    password:password
+                }
+                axios.post("https://crudcrud.com/api/b0c5827ca99749e0b257b947cbce7675/appointmentDate",obj)
+                    .then((Response) => {
+                        showNewUserOnScreen(response.data)
+                        // console.log(response);
+                    })
+                    .catch((err) => {
+                        document.body.innerHTML=document.body.innerHTML+"<h4> Something went wrong</h4>"
+                        console.log(err);
+                    })
+                // localStorage.setItem(obj.email,JSON.stringify(obj));
+                //  showNewUserOnScreen(obj)
+        	}
+            window.addEventListener("DOMContentLoaded", () => {
+                const localStorageObj = localStorage;
+                const localstoragekeys  = Object.keys(localStorageObj)
+
+                for(var i =0; i< localstoragekeys.length; i++){
+                    const key = localstoragekeys[i]
+                    const userDetailsString = localStorageObj[key];
+                    const userDetailsObj = JSON.parse(userDetailsString);
+                    showNewUserOnScreen(userDetailsObj)
+                }
+            })
+
+            function showNewUserOnScreen(user){
+                const parentNode = document.getElementById('listOfUsers');
+                const childHTML = `<li id=${user.email}> ${user.name} - ${user.email}
+                                        <button onclick=deleteUser('${user.email}')> Delete User </button>
+                                     </li>`
+
+                parentNode.innerHTML = parentNode.innerHTML + childHTML;
+            }
+
+            // deleteUser('abc@gmail.com')
+
+            function deleteUser(emailId){
+                console.log(emailId)
+                localStorage.removeItem(emailId);
+                removeUserFromScreen(emailId);
+
+            }
+
+            function removeUserFromScreen(emailId){
+                const parentNode = document.getElementById('listOfUsers');
+                const childNodeToBeDeleted = document.getElementById(emailId);
+
+                parentNode.removeChild(childNodeToBeDeleted)
+            } 
+        </script>
+    </body>
+</html>
